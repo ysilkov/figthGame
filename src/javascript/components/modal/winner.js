@@ -1,3 +1,10 @@
+import { showModal } from "./modal";
+
 export function showWinnerModal(fighter) {
-  // call showModal function 
+  const infoForWinner = {
+    title: 'YOU WIN! CONGRUTULATION',
+    bodyElement: fighter.name
+  }
+  showModal (fighter);
 }
+
