@@ -21,6 +21,11 @@ const fighterDetailsMap = new Map();
 
 export async function getFighterInfo(fighterId) {
   // get fighter info from fighterDetailsMap or from service and write it to fighterDetailsMap
+  try{
+    if(!fighterDetailsMap.has(fighterId)){
+      const figthInfo = await fighterService.getFighterInfo(fighterId);
+    }
+  }
 }
 
 function renderSelectedFighters(selectedFighters) {
