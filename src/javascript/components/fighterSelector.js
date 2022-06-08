@@ -2,6 +2,7 @@ import { createElement } from '../helpers/domHelper';
 import { renderArena } from './arena';
 import versusImg from '../../../resources/versus.png';
 import { createFighterPreview } from './fighterPreview';
+import { fighterService } from '../services/fightersService';
 
 export function createFightersSelector() {
   let selectedFighters = [];

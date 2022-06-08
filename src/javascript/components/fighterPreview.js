@@ -7,9 +7,10 @@ export function createFighterPreview(fighter, position) {
     className: `fighter-preview___root ${positionClassName}`,
   });
 
-  function createProperty(fighterName) {
+  function createProperty(keyValue) {
     const nameElement = createElement({ tagName: 'span', className: 'fighter-preview___property' });
-    nameElement.innerText = fighterName.join(': ').replace(/(\w+):/, subStr => subStr.toUpperCase());
+    nameElement.innerText = keyValue.join(': ').replace(/(\w+):/, subStr => subStr.toUpperCase());
+  
     return nameElement;
   }
 
@@ -29,11 +30,11 @@ export function createFighterPreview(fighter, position) {
   }
 
   if(fighter) {
-    const fighterNameArrayOfObject = Object.entries(fighter);
+    const keyValueArrayOfObject = Object.entries(fighter);
     fighterElement.append(createPreviewImage(fighter['source']));
-    fighterNameArrayOfObject
-    .filter(fighterNameAll => fighterNameAll[0] !== '_id' && fighterName[0] !== 'source')
-    .forEach(fighterName => fighterElement.append(createProperty(fighterName)));
+    keyValueArrayOfObject
+    .filter(keyValueAll => keyValueAll[0] !== '_id' && keyValueAll[0] !== 'source')
+    .forEach(keyValue => fighterElement.append(createProperty(keyValue)));
   }
 
   return fighterElement;
