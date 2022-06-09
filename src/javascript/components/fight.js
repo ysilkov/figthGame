@@ -12,14 +12,14 @@ export async function fight(firstFighter, secondFighter) {
       critInput: []
     }
 
-    const playerOne = { 
+    const figtherLeft = { 
       ...firstFighter, 
       ...statusInfo, 
       healthBar: healthBars[0], 
       position: 'left'
     }
 
-    const playerTwo = { 
+    const figtherRight = { 
       ...secondFighter, 
       ...statusInfo, 
       healthBar: healthBars[1], 
@@ -63,7 +63,7 @@ export async function fight(firstFighter, secondFighter) {
       defender.healthBar.style.width = `${defender.currentHealth}%`;
     }
 
-    function critHandler(fighter) {
+    function critShock(fighter) {
       const currentTime = Date.now();
 
       if(currentTime - fighter.timeOfCrit < 10000) {
@@ -84,48 +84,48 @@ export async function fight(firstFighter, secondFighter) {
       if(!event.repeat) {
         switch(event.code) {
           case controls.PlayerOneAttack: {
-            attackRelease(playerOne, playerTwo);
+            attackRelease(figtherLeft, figtherRight);
             break;
           }
 
           case controls.PlayerTwoAttack: {
-            attackRelease(playerTwo, playerOne);
+            attackRelease(figtherRight, figtherLeft);
             break;
           }
 
           case controls.PlayerOneBlock: {
-            playerOne.block = true;
+            figtherLeft.block = true;
             break;
           }
 
           case controls.PlayerTwoBlock: {
-            playerTwo.block = true;
+            figtherRight.block = true;
             break;
           }
         }
 
         if(controls.PlayerOneCriticalHitCombination.includes(event.code)) {
-          critHandler(playerOne) ? attackRelease(playerOne, playerTwo) : null;
+          critShock(figtherLeft) ? attackRelease(figtherLeft, figtherRight) : null;
         }
 
         if(controls.PlayerTwoCriticalHitCombination.includes(event.code)) {
-          critHandler(playerTwo) ? attackRelease(playerTwo, playerOne) : null;
+          critShock(figtherRight) ? attackRelease(figtherRight, figtherLeft) : null;
         }
       }
     }
 
     function onUp(event) {
       switch(event.code) {
-        case controls.PlayerOneBlock: playerOne.block = false; break;
-        case controls.PlayerTwoBlock: playerTwo.block = false; break;
+        case controls.PlayerOneBlock: figtherLeft.block = false; break;
+        case controls.PlayerTwoBlock: figtherRight.block = false; break;
       }
 
-      if(playerOne.critInput.includes(event.code)) {
-        playerOne.critInput.splice(playerOne.critInput.indexOf(event.code), 1);
+      if(figtherLeft.critInput.includes(event.code)) {
+        figtherLeft.critInput.splice(figtherLeft.critInput.indexOf(event.code), 1);
       }
 
-      if(playerTwo.critInput.includes(event.code)) {
-        playerTwo.critInput.splice(playerTwo.critInput.indexOf(event.code), 1);
+      if(figtherRight.critInput.includes(event.code)) {
+        figtherRight.critInput.splice(figtherRight.critInput.indexOf(event.code), 1);
       }
     }
 

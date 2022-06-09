@@ -1,7 +1,7 @@
 .fighter-preview___root {
   display: flex;
   flex-direction: column;
-  flex-basis: 150px;
+  flex-basis: 250px;
 }
 
 .fighter-preview___right {
@@ -10,4 +10,17 @@
 
 .fighter-preview___left {
   align-items: flex-start;
+}
+
+.fighter-image___preview {
+  height: 200px;
+  width: 150px;
+}
+
+.fighter-preview___property {
+  font-size: 25px;
+  font-weight: bolder;
+  font-family:  'Georgia', serif;
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-fill-color: white;
 }
