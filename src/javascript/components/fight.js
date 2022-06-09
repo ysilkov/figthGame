@@ -102,6 +102,15 @@ export async function fight(firstFighter, secondFighter) {
             figtherRight.block = true;
             break;
           }
+          case controls.PlayerOneCriticalHitCombination: {
+            figtherLeft.block = false;
+            break;
+          }
+
+          case controls.PlayerTwoCriticalHitCombination: {
+            figtherRight.block = false;
+            break;
+          }
         }
 
         if(controls.PlayerOneCriticalHitCombination.includes(event.code)) {
@@ -140,7 +149,7 @@ export function getDamage(attacker, defender) {
 }
 
 export function getHitPower(fighter) {
-  const criticalHitChance = fighter.critInput === 3 ? 2 : Math.random() + 1;
+  const criticalHitChance = fighter.critInput.length === 3 ? 2 : Math.random() + 1;
   return fighter.attack * criticalHitChance;
 }
 
