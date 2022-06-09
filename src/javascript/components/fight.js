@@ -62,9 +62,24 @@ export async function fight(firstFighter, secondFighter) {
 
       defender.healthBar.style.width = `${defender.currentHealth}%`;
     }
+/*     const controlCritLeft = controls.PlayerOneCriticalHitCombination;
+    const controlCritRigth = controls.PlayerTwoCriticalHitCombination;
+    const combinationTrueLeft = function (controlCritLeft, fighter) {
+      for (let i =0; i< controlCrit.length; i++){
+        if(controlCritLeft[i]===fighter.critInput[i]) return true
+        return false
+      }
+    }
+    const combinationTrueRigth = function (controlCritRigth, fighter) {
+      for (let i =0; i< controlCrit.length; i++){
+        if(controlCritRigth[i]===fighter.critInput[i]) return true
+        return false
+      }
+    } */
 
     function critShock(fighter) {
       const currentTime = Date.now();
+      fighter.block = false;
 
       if(currentTime - fighter.timeOfCrit < 10000) {
         return false;
@@ -78,8 +93,10 @@ export async function fight(firstFighter, secondFighter) {
         fighter.timeOfCrit = currentTime;
         return true;
       }
+      
     }
-
+    
+     
     function onDown(event) {
       if(!event.repeat) {
         switch(event.code) {
@@ -102,15 +119,19 @@ export async function fight(firstFighter, secondFighter) {
             figtherRight.block = true;
             break;
           }
-          case controls.PlayerOneCriticalHitCombination: {
-            figtherLeft.block = false;
+          case controls.PlayerTwoBlock: {
+            figtherRight.block = true;
             break;
           }
-
-          case controls.PlayerTwoCriticalHitCombination: {
+       /*    case combinationTrueLeft===true: {
             figtherRight.block = false;
             break;
           }
+          case combinationTrueRigth===true: {
+            figtherLeft.block = false;
+            break;
+          }  */
+
         }
 
         if(controls.PlayerOneCriticalHitCombination.includes(event.code)) {
@@ -130,11 +151,11 @@ export async function fight(firstFighter, secondFighter) {
       }
 
       if(figtherLeft.critInput.includes(event.code)) {
-        figtherLeft.critInput.splice(figtherLeft.critInput.indexOf(event.code), 1);
+        return figtherLeft.critInput.splice(figtherLeft.critInput.indexOf(event.code), 1);
       }
 
       if(figtherRight.critInput.includes(event.code)) {
-        figtherRight.critInput.splice(figtherRight.critInput.indexOf(event.code), 1);
+        return figtherRight.critInput.splice(figtherRight.critInput.indexOf(event.code), 1);
       }
     }
 
@@ -149,7 +170,7 @@ export function getDamage(attacker, defender) {
 }
 
 export function getHitPower(fighter) {
-  const criticalHitChance = fighter.critInput.length === 3 ? 2 : Math.random() + 1;
+  let criticalHitChance = fighter.critInput.length === 3 ? 2 : Math.random() + 1;
   return fighter.attack * criticalHitChance;
 }
 
