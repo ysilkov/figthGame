@@ -2,122 +2,149 @@ import { controls } from '../../constants/controls';
 
 export async function fight(firstFighter, secondFighter) {
   return new Promise((resolve) => {
-    let fighterLeft = {
-      fighter: firstFighter,
-      health: firstFighter.health,
-      blockCritical: false,
-      position: document.getElementById('left-fighter-indicator')
-    };
-    let fighterRight = {
-      fighter: secondFighter,
-      health: secondFighter.health,
-      blockCritical: false,
-      position: document.getElementById('right-fighter-indicator')
-    };
-  
-    let clickButtom = new Set();
 
-  document.addEventListener('keydown', (event) => {
-    clickButtom.add(event.code);
+    const healthBarsContainer = document.getElementsByClassName('arena___health-bar');
+    const healthBars = [ ...healthBarsContainer ];
+    const statusInfo = {
+      block: false,  
+      currentHealth: 100,
+      timeOfCrit: Date.now(),
+      critInput: []
+    }
 
-    switch (event.code) {
-      case controls.PlayerOneAttack:
-        if (!clickButtom.has(controls.PlayerOneBlock) && !clickButtom.has(controls.PlayerTwoBlock)) {
-          shock(fighterLeft, fighterRight);
-        }
-        if (clickButtom.has(controls.PlayerTwoBlock)) {
-          showIconHit(fighterRight, 'block');
-        } 
-        break;
-      case controls.PlayerTwoAttack:
-        if (!clickButtom.has(controls.PlayerTwoBlock) && !clickButtom.has(controls.PlayerOneBlock)) {
-          shock(fighterRight, fighterLeft);
-        }
-        if (clickButtom.has(controls.PlayerOneBlock)) {
-          showIconHit(fighterLeft, 'block');
-        } 
-        break;
+    const playerOne = { 
+      ...firstFighter, 
+      ...statusInfo, 
+      healthBar: healthBars[0], 
+      position: 'left'
+    }
+
+    const playerTwo = { 
+      ...secondFighter, 
+      ...statusInfo, 
+      healthBar: healthBars[1], 
+      position: 'right'
+    }
+
+    function showStatus(fighter) {
+      if(document.getElementById(`${fighter.position}-status-marker`)) {
+        document.getElementById(`${fighter.position}-status-marker`).remove();
       }
-    if (!fighterLeft.blockCriticalHit &&
-        controls.PlayerOneCriticalHitCombination.includes(event.code) &&
-        checkKeysCriticalHit(controls.PlayerOneCriticalHitCombination, clickButtom)) {
-      shock(fighterLeft, fighterRight, true);
     }
-    if (!fighterTwo.blockCriticalHit &&
-        controls.PlayerTwoCriticalHitCombination.includes(event.code) &&
-        checkKeysCriticalHit(controls.PlayerTwoCriticalHitCombination, clickButtom)) {
-      shock(fighterRight, fighterLeft, true);
-    }
-  });
 
-  document.addEventListener('keyup', (event) => {
-    clickButtom.delete(event.code);
-  });
+    function attackRelease(attacker, defender) {
+      if(attacker.block) {
+        showStatus(attacker);
+        return void 0;
+      }
 
-  function shock(attacker, defender, isCritical = false) {
-    let damage;
-    if (isCritical) {
-      damage = getCriticalDamage(attacker.fighter);
-      attacker.blockCritical = true;
-      setTimeout(() => {
-        attacker.blockCritical = false;
-      }, 10000);
-    } else {
-      damage = getDamage(attacker.fighter, defender.fighter);
+      if(defender.block) {
+        showStatus(defender);
+        return void 0;
+      }
+
+      const totalDamage = getDamage(attacker, defender);
+
+      if(!totalDamage) {
+        showStatus(attacker);
+        return void 0;
+      }
+
+      if(attacker.critInput.length === 3) {
+        showStatus(attacker);
+      }
+
+      showStatus(defender, `-${totalDamage.toFixed(1)}`);
+      defender.currentHealth = defender.currentHealth - totalDamage / defender.health * 100;
+      if(defender.currentHealth < 0) {
+        resolve(attacker);
+      }
+
+      defender.healthBar.style.width = `${defender.currentHealth}%`;
     }
-    defender.health -= damage;
-    setFighterHealthBar(defender);
-    if (defender.health <= 0) resolve(attacker.fighter);
-  }
-});
+
+    function critHandler(fighter) {
+      const currentTime = Date.now();
+
+      if(currentTime - fighter.timeOfCrit < 10000) {
+        return false;
+      }
+
+      if(!fighter.critInput.includes(event.code)) {
+        fighter.critInput.push(event.code);
+      }
+
+      if(fighter.critInput.length === 3) {
+        fighter.timeOfCrit = currentTime;
+        return true;
+      }
+    }
+
+    function onDown(event) {
+      if(!event.repeat) {
+        switch(event.code) {
+          case controls.PlayerOneAttack: {
+            attackRelease(playerOne, playerTwo);
+            break;
+          }
+
+          case controls.PlayerTwoAttack: {
+            attackRelease(playerTwo, playerOne);
+            break;
+          }
+
+          case controls.PlayerOneBlock: {
+            playerOne.block = true;
+            break;
+          }
+
+          case controls.PlayerTwoBlock: {
+            playerTwo.block = true;
+            break;
+          }
+        }
+
+        if(controls.PlayerOneCriticalHitCombination.includes(event.code)) {
+          critHandler(playerOne) ? attackRelease(playerOne, playerTwo) : null;
+        }
+
+        if(controls.PlayerTwoCriticalHitCombination.includes(event.code)) {
+          critHandler(playerTwo) ? attackRelease(playerTwo, playerOne) : null;
+        }
+      }
+    }
+
+    function onUp(event) {
+      switch(event.code) {
+        case controls.PlayerOneBlock: playerOne.block = false; break;
+        case controls.PlayerTwoBlock: playerTwo.block = false; break;
+      }
+
+      if(playerOne.critInput.includes(event.code)) {
+        playerOne.critInput.splice(playerOne.critInput.indexOf(event.code), 1);
+      }
+
+      if(playerTwo.critInput.includes(event.code)) {
+        playerTwo.critInput.splice(playerTwo.critInput.indexOf(event.code), 1);
+      }
+    }
+
+    document.addEventListener('keydown', onDown);
+    document.addEventListener('keyup', onUp);
+  });
 }
 
 export function getDamage(attacker, defender) {
-  const hitPower = getHitPower(attacker);
-  const blockPower = getBlockPower(defender);
-  let damage = hitPower - blockPower;
-  damage = damage > 0 ? damage : 0;
-  return damage;
-}
-
-export function getCriticalDamage(attacker) {
-  const damage = attacker.attack * 2;
-  return damage;
+  const damage = getHitPower(attacker) - getBlockPower(defender);
+  return damage > 0 ? damage : 0;
 }
 
 export function getHitPower(fighter) {
-  const criticalHitChance = Math.random() + 1;
-  const power = fighter.attack * criticalHitChance;
-  return power;
+  const criticalHitChance = fighter.critInput === 3 ? 2 : Math.random() + 1;
+  return fighter.attack * criticalHitChance;
 }
 
 export function getBlockPower(fighter) {
-  const dodgeChance = Math.random() + 1;
-  const power = fighter.defense * dodgeChance;
-  return power;
+  const dodjeChance = Math.random() + 1;
+  return fighter.defense * dodjeChance;
 }
-
-function checkKeysCriticalHit(keys, pressed) {
-  for (let key of keys) {
-    if (!pressed.has(key)) {
-      return false;
-    }
-  }
-  return true;
-}
-export function setFighterHealthBar(player) {
-  let percent = (player.health * 100) / player.fighter.health;
-  /* if (percent < 0) percent = 0;
-  player.indicator.style.width = `${percent}%`; */
-}
-
-
-/* export function showIconHit(fighter, type = 'hit') {
-  let cls = 'arena___health-hit';
-  if (type === 'crit') cls = 'arena___health-crit';
-  if (type === 'block') cls = 'arena___health-block';
-  fighter.indicator.classList.add(cls);
-  setTimeout(() => {
-    fighter.indicator.classList.remove(cls);
-  }, 200);
-} */

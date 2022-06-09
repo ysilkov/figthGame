@@ -5,6 +5,6 @@ export function showWinnerModal(fighter) {
     title: 'YOU WIN! CONGRUTULATION',
     bodyElement: fighter.name
   }
-  showModal (fighter);
+  showModal (infoForWinner);
 }
 
