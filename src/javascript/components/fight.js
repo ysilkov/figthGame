@@ -81,8 +81,7 @@ export async function fight(firstFighter, secondFighter) {
       }
       
     }
-    
-     
+
     function onDown(event) {
       if(!event.repeat) {
         switch(event.code) {
@@ -105,11 +104,6 @@ export async function fight(firstFighter, secondFighter) {
             figtherRight.block = true;
             break;
           }
-          case controls.PlayerTwoBlock: {
-            figtherRight.block = true;
-            break;
-          }
-
         }
 
         if(controls.PlayerOneCriticalHitCombination.includes(event.code)) {
@@ -148,7 +142,7 @@ export function getDamage(attacker, defender) {
 }
 
 export function getHitPower(fighter) {
-  let criticalHitChance = fighter.critInput.length === 3 ? 2 : Math.random() + 1;
+  let criticalHitChance = fighter.critInput.length === 3 ? 2 : Math.random()+1;
   return fighter.attack * criticalHitChance;
 }
 
