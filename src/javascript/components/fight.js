@@ -62,20 +62,6 @@ export async function fight(firstFighter, secondFighter) {
 
       defender.healthBar.style.width = `${defender.currentHealth}%`;
     }
-/*     const controlCritLeft = controls.PlayerOneCriticalHitCombination;
-    const controlCritRigth = controls.PlayerTwoCriticalHitCombination;
-    const combinationTrueLeft = function (controlCritLeft, fighter) {
-      for (let i =0; i< controlCrit.length; i++){
-        if(controlCritLeft[i]===fighter.critInput[i]) return true
-        return false
-      }
-    }
-    const combinationTrueRigth = function (controlCritRigth, fighter) {
-      for (let i =0; i< controlCrit.length; i++){
-        if(controlCritRigth[i]===fighter.critInput[i]) return true
-        return false
-      }
-    } */
 
     function critShock(fighter) {
       const currentTime = Date.now();
@@ -123,14 +109,6 @@ export async function fight(firstFighter, secondFighter) {
             figtherRight.block = true;
             break;
           }
-       /*    case combinationTrueLeft===true: {
-            figtherRight.block = false;
-            break;
-          }
-          case combinationTrueRigth===true: {
-            figtherLeft.block = false;
-            break;
-          }  */
 
         }
 
