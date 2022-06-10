@@ -142,8 +142,8 @@ export function getDamage(attacker, defender) {
 }
 
 export function getHitPower(fighter) {
-  let criticalHitChance = fighter.critInput === 3 ? 2 : Math.random() + 1;
-  return fighter.attack * criticalHitChance;
+  let randomNumber =  Math.random() + 1;
+  return fighter.attack * randomNumber;
 }
 
 export function getBlockPower(fighter) {
